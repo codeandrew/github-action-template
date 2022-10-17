@@ -62,7 +62,24 @@ jobs:
         echo "TEST IMAGE"
         export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         echo "TESTING: $IMAGE"
-      
+
+    - name: Setup Trivy
+      run: |
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+
+    - name: Pull Image
+      run: |
+        docker pull 
+
+    - name: Scan Image
+      run: |
+        export DOCKER_IMAGE="python:3.7"
+        trivy image $DOCKER_IMAGE
+
   deploy:
     needs: [test_image]
     runs-on: ubuntu-latest
