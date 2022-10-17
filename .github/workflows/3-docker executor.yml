@@ -12,7 +12,7 @@ on:
 jobs:
   container:
     # runs-on: wsl-1
-    runs-on: wsl-1
+    runs-on: win10
     container: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
