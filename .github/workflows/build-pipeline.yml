@@ -8,14 +8,14 @@ env:
 
 jobs:
 
-  lint:
-    runs-on: ubuntu-latest
-    container: ubuntu:22.04
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   container: ubuntu:22.04
 
-    steps:
-    - name: Lint code
-      run: |
-        echo "CODE LINTER RUNNING"
+  #   steps:
+  #   - name: Lint code
+  #     run: |
+  #       echo "CODE LINTER RUNNING"
     # - uses: actions/checkout@v1
     # - name: Setup Python environment
     #   uses: actions/setup-python@v1.1.1
@@ -29,31 +29,31 @@ jobs:
     #   run: |
     #     python -m unittest --verbose --failfast        
 
-  build_image:
-    needs: [lint]
-    runs-on: ubuntu-latest
-    container: ubuntu:22.04
+  # build_image:
+  #   needs: [lint]
+  #   runs-on: ubuntu-latest
+  #   container: ubuntu:22.04
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Build Application
-      run: |
-        echo "BUILD COMMANDS"
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #   - name: Build Application
+  #     run: |
+  #       echo "BUILD COMMANDS"
     
-    - name: Build and Tag
-      run: |
-        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-        echo "Building $IMAGE"
-        # docker build -t $IMAGE  .
+  #   - name: Build and Tag
+  #     run: |
+  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+  #       echo "Building $IMAGE"
+  #       # docker build -t $IMAGE  .
       
-    - name: Push to image registry
-      run: |
-        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-        echo "Pushing $IMAGE"
-        # docker push $IMAGE
+  #   - name: Push to image registry
+  #     run: |
+  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+  #       echo "Pushing $IMAGE"
+  #       # docker push $IMAGE
 
   test_image:
-    needs: [build_image]
+    # needs: [build_image]
     runs-on: ubuntu-latest
     container: ubuntu:22.04
     steps:
@@ -64,7 +64,6 @@ jobs:
         echo "TESTING: $IMAGE"
         
         uname -a
-        lsb_relase -a
         ls -latr /etc /bin
 
 
@@ -85,12 +84,12 @@ jobs:
         export DOCKER_IMAGE="python:3.4-alpine"
         trivy image $DOCKER_IMAGE
 
-  deploy:
-    needs: [test_image]
-    runs-on: ubuntu-latest
-    container: ubuntu:22.04
-    steps:
-    - name: Test deployment
-      run: |
-        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-        echo "Deploy code"
+  # deploy:
+  #   needs: [test_image]
+  #   runs-on: ubuntu-latest
+  #   container: ubuntu:22.04
+  #   steps:
+  #   - name: Test deployment
+  #     run: |
+  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+  #       echo "Deploy code"
