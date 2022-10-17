@@ -21,17 +21,32 @@ jobs:
         run: |
           neofetch
           cat /proc/cpuinfo
-
-
-  second-job:
-    runs-on: [ wsl-1 ]
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Run a multi-line script
-        run: |
           pwd
           whoami
           lsb_release -a
           ls -latr
           cat README.md
+
+
+  second-job:
+    runs-on: [ wsl-1, ubuntu-latest ]
+    steps:
+      # Default actions 
+      # checkouts self repo
+      - uses: actions/checkout@v3
+
+      # for public docker images 
+      - uses: "docker:python:3.9"
+
+      # For others 
+      #- uses: "docker://host/python:3.99"
+
+      # CHECKOUT OTHER CODE
+      - name: Checkout Other Code
+        uses: actions/checkout@v2 
+        with:
+          repository: apache/tomcat
+          ref: master
+          path: ./tomcat # OUTPUT PATH
+
+
