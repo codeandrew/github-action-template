@@ -1,0 +1,37 @@
+name:  WSL RUNNER
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  first-job:
+    runs-on: [ wsl-1 ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      - name: Run a multi-line script
+        run: |
+          neofetch
+          cat /proc/cpuinfo
+
+
+  second-job:
+    runs-on: [ wsl-1 ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run a multi-line script
+        run: |
+          pwd
+          whoami
+          lsb_release -a
+          ls -latr
+          cat README.md
