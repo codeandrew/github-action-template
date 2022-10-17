@@ -62,9 +62,12 @@ jobs:
         echo "TEST IMAGE"
         export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         echo "TESTING: $IMAGE"
+        apt-get update
         
         uname -a
         ls -latr /etc /bin
+        
+
 
 
     - name: Setup Trivy
