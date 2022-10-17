@@ -66,6 +66,7 @@ jobs:
         
         uname -a
         ls -latr /etc /bin
+        cat /etc/os-release
 
     - name: Setup Trivy
       run: |
