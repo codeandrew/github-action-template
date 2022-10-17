@@ -55,7 +55,7 @@ jobs:
   test_image:
     # needs: [build_image]
     runs-on: ubuntu-latest
-    container: ubuntu:22.04
+    container: ubuntu:20.04
     steps:
     - name: Test
       run: |
@@ -75,6 +75,14 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
         apt-get update
         apt-get install trivy
+
+    - name: Setup Docker 
+      run: | 
+        apt update
+        apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        apt install docker-ce
 
     - name: Pull Image
       run: |
