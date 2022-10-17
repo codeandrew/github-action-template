@@ -10,7 +10,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    container: ubuntu:20.4
+    container: ubuntu:22.04
 
     steps:
     - name: Lint code
@@ -32,7 +32,7 @@ jobs:
   build_image:
     needs: [lint]
     runs-on: ubuntu-latest
-    container: ubuntu-18.04
+    container: ubuntu:22.04
 
     steps:
     - uses: actions/checkout@v1
@@ -55,7 +55,7 @@ jobs:
   test_image:
     needs: [build_image]
     runs-on: ubuntu-latest
-    container: ubuntu-18.04
+    container: ubuntu:22.04
     steps:
     - name: Test
       run: |
@@ -65,7 +65,7 @@ jobs:
       
   deploy:
     needs: [test_image]
-    runs-on: ubuntu-18.04
+    container: ubuntu:22.04
     steps:
     - name: Test deployment
       run: |
