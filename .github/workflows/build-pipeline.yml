@@ -93,10 +93,10 @@ jobs:
       run: |
         export DOCKER_IMAGE="python:3.4-alpine"
         trivy image $DOCKER_IMAGE
-        echo ;echo ;echo ;echo ;
-        trivy image -f json -o results.json $DOCKER_IMAGE 
-        echo ;echo ;echo ;echo ;
-        trivy image -f json -o results.json $DOCKER_IMAGE > /tmp/vulnerabilities.json
+        # echo ;echo ;echo ;echo ;
+        # trivy image -f json -o results.json $DOCKER_IMAGE 
+        # echo ;echo ;echo ;echo ;
+        trivy image -f json -o /tmp/results.json $DOCKER_IMAGE > /tmp/vulnerabilities.json
 
         ls -latr 
         ls -latr /tmp
@@ -105,8 +105,13 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: vulnerabilities
-        path: /tmp/vulnerabilities.json
+        path: /tmp/*.json
 
+    - name: Upload Findings 2
+      uses: actions/upload-artifact@v3
+      with:
+        name: vulnerabilities-2
+        path: /tmp/results.json
 
   # deploy:
   #   needs: [test_image]
