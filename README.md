@@ -71,9 +71,37 @@ volumes:
   postgresql_data:
 ```
 
+SonarQube Github Actions
+Usage
+```
+on:
+  # Trigger analysis when pushing in master or pull requests, and when creating
+  # a pull request. 
+  push:
+    branches:
+      - master
+  pull_request:
+      types: [opened, synchronize, reopened]
+
+name: Main Workflow
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+```
+
 Reference 
 - https://docs.sonarqube.org/latest/setup/install-server/
-
+- https://github.com/marketplace/actions/official-sonarqube-scan
 
 ### REFERENCES
 - https://owasp.org/www-project-devsecops-guideline/latest/02f-Container-Vulnerability-Scanning
