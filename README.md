@@ -14,6 +14,48 @@ Harbor - Harbor is an open source registry that secures artifacts with policies 
 Trivy - Trivy is a simple and comprehensive vulnerability/misconfiguration scanner for containers and other artifacts.
 ```
 
+### SONAR QUBE
+
+
+```yaml
+version: "3"
+
+services:
+  sonarqube:
+    image: sonarqube:community
+    depends_on:
+      - db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
+```
+
+Reference 
+- https://docs.sonarqube.org/latest/setup/install-server/
+
+
 ### REFERENCES
 - https://owasp.org/www-project-devsecops-guideline/latest/02f-Container-Vulnerability-Scanning
 - https://opensource.com/article/18/8/tools-container-security
