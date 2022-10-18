@@ -1,5 +1,22 @@
 # github-action-template
 
+## Docker CheatSheet
+
+```
+---
+version: "3"
+services:
+  web:
+    image: httpd
+    ports:
+      - "8080:80"
+    volumes:
+      - mydata:/data
+
+volumes:
+  mydata
+```
+
 ## Security 
 
 For making the pipeline secure
