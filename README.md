@@ -17,6 +17,8 @@ volumes:
   mydata
 ```
 
+For binding the volumes to a path
+
 ## Security 
 
 For making the pipeline secure
