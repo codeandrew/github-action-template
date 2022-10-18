@@ -8,6 +8,17 @@ env:
 
 jobs:
 
+  debug:
+    runs-on: jaf1
+
+    steps:
+    - name: DEBUG RUNNER
+      run: |
+        echo "CODE LINTER RUNNING"
+        whoami
+        id
+        docker ps
+
   # lint:
   #   runs-on: jaf1
   #   container: ubuntu:22.04
@@ -31,6 +42,7 @@ jobs:
 
   build_image:
     # needs: [lint]
+    needs: [debug]
     runs-on: jaf1
     container: ubuntu:22.04
 
@@ -53,7 +65,7 @@ jobs:
         # docker push $IMAGE
 
   test_image:
-    # needs: [build_image]
+    needs: [build_image]
     runs-on: jaf1
     container: ubuntu:20.04
     steps:
