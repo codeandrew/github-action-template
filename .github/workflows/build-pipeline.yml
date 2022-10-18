@@ -9,7 +9,7 @@ env:
 jobs:
 
   # lint:
-  #   runs-on: ubuntu-latest
+  #   runs-on: jaf1
   #   container: ubuntu:22.04
 
   #   steps:
@@ -29,32 +29,32 @@ jobs:
     #   run: |
     #     python -m unittest --verbose --failfast        
 
-  # build_image:
-  #   needs: [lint]
-  #   runs-on: ubuntu-latest
-  #   container: ubuntu:22.04
+  build_image:
+    # needs: [lint]
+    runs-on: jaf1
+    container: ubuntu:22.04
 
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Build Application
-  #     run: |
-  #       echo "BUILD COMMANDS"
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build Application
+      run: |
+        echo "BUILD COMMANDS"
     
-  #   - name: Build and Tag
-  #     run: |
-  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-  #       echo "Building $IMAGE"
-  #       # docker build -t $IMAGE  .
+    - name: Build and Tag
+      run: |
+        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        echo "Building $IMAGE"
+        # docker build -t $IMAGE  .
       
-  #   - name: Push to image registry
-  #     run: |
-  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-  #       echo "Pushing $IMAGE"
-  #       # docker push $IMAGE
+    - name: Push to image registry
+      run: |
+        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        echo "Pushing $IMAGE"
+        # docker push $IMAGE
 
   test_image:
     # needs: [build_image]
-    runs-on: ubuntu-latest
+    runs-on: jaf1
     container: ubuntu:20.04
     steps:
     - name: Test
@@ -107,6 +107,7 @@ jobs:
   # deploy:
   #   needs: [test_image]
   #   runs-on: ubuntu-latest
+  #   runs-on: jaf1
   #   container: ubuntu:22.04
   #   steps:
   #   - name: Test deployment
