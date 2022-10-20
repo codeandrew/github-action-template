@@ -15,13 +15,13 @@ jobs:
     - name: DEBUG RUNNER
       run: |
         echo "CODE LINTER RUNNING"
+        neofetch
         whoami
         id
         docker ps
 
 
   build_image:
-    # needs: [lint]
     needs: [debug]
     runs-on: jaf1
     container: ubuntu:22.04
@@ -48,6 +48,10 @@ jobs:
         echo "Building $IMAGE"
         docker build -t $IMAGE  .
       
+    - name: Docker Login
+      run: |
+        docker login ${{ secrets.DOCKER_USER }} ${{ secrets.DOCKER_PASSWORD }}
+
     - name: Push to image registry
       run: |
         cd app
