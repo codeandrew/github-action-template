@@ -64,16 +64,6 @@ jobs:
     runs-on: jaf1
     container: ubuntu:20.04
     steps:
-    - name: Test
-      run: |
-        echo "TEST IMAGE"
-        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-        echo "TESTING: $IMAGE"
-        apt-get update
-        
-        uname -a
-        ls -latr /etc /bin
-        cat /etc/os-release
 
     - name: Setup Trivy
       run: |
