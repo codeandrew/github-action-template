@@ -23,7 +23,7 @@ def check_vulnerabilities(data):
         log("Medium Vulnerabilities")
         log(medium)
 
-        if critical > 0 or high > 0
+        if critical > 0 or high > 0:
             log("[!] High Vulnerabilties Treshold")
             log("[!] Failing pipeline ...")
             exit(1)
