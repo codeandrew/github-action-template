@@ -82,11 +82,6 @@ jobs:
 
     - name: Setup Trivy
       run: |
-        #apt-get install wget apt-transport-https gnupg lsb-release -y
-        #wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | tee /usr/share/keyrings/trivy.gpg > /dev/null
-        #echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
-        #apt-get update
-        #apt-get install trivy
         export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
         wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
         tar zxvf trivy_${VERSION}_Linux-64bit.tar.gz'])"')
@@ -95,9 +90,9 @@ jobs:
       run: |
         #export DOCKER_IMAGE="python:3.4-alpine"
         export DOCKER_IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
-        trivy image $DOCKER_IMAGE
+        ./trivy image $DOCKER_IMAGE
 
-        trivy image -f json -o /tmp/trivy-results.json $DOCKER_IMAGE 
+        ./trivy image -f json -o /tmp/trivy-results.json $DOCKER_IMAGE 
         ls -latr /tmp
 
     - name: Upload Findings
