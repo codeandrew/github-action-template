@@ -106,7 +106,7 @@ jobs:
         export DOCKER_IMAGE="python:3.4-alpine"
         trivy image $DOCKER_IMAGE
 
-        trivy image -f json -o /tmp/results.json $DOCKER_IMAGE 
+        trivy image -f json -o /tmp/trivy-results.json $DOCKER_IMAGE 
         ls -latr /tmp
 
     - name: Upload Findings
@@ -120,7 +120,7 @@ jobs:
         python-version: '3.10' 
 
     - name: Trivy Summary 
-      run: python scripts/trivy-summary.py
+      run: python scripts/trivy-summary.py /tmp/trivy-results.json
 
   # deploy:
   #   needs: [test_image]
