@@ -32,7 +32,7 @@ def summary():
         try:
             with open(filepath) as f:
                 result = json.load(f)
-                for target in result:
+                for target in result['Results']:
                     target_info = target.get("Target")
                     if target_info.find("(") != -1:
                         ret_json["OS"] = target_info.split("(")[1].split(")")[0]
