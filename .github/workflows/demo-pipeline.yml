@@ -1,0 +1,127 @@
+name: Demo Pipeline
+
+on: [push]
+env:
+  APPLICATION_NAME: demoflask
+  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+  APP_VERSION: 1
+
+jobs:
+
+  debug:
+    runs-on: jaf1
+
+    steps:
+    - name: DEBUG RUNNER
+      run: |
+        echo "CODE LINTER RUNNING"
+        neofetch
+        whoami
+        id
+        docker ps
+
+
+  build_image:
+    needs: [debug]
+    runs-on: jaf1
+    container: ubuntu:22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Docker 
+      run: | 
+        apt update
+        apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        apt install docker-ce -y
+
+    - name: Build Application
+      run: |
+        echo "BUILD COMMANDS"
+    
+    - name: Build and Tag
+      run: |
+        cd app
+        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        echo "Building $IMAGE"
+        docker build -t $IMAGE  .
+      
+    - name: Docker Login
+      run: |
+        docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push to image registry
+      run: |
+        cd app
+        export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        echo "Pushing $IMAGE"
+        docker push $IMAGE
+
+  scan_image:
+    needs: [build_image]
+    runs-on: jaf1
+    container: ubuntu:20.04
+    steps:
+
+    - name: Setup OS
+      run: |
+        apt-get update 
+        apt-get install -y wget curl
+
+    - name: Setup Trivy
+      run: |
+        export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+        echo "DOWNLOADING TRIVY VERSION - $VERSION"
+        wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
+        tar zxvf trivy_${VERSION}_Linux-64bit.tar.gz
+
+    - name: Setup Docker 
+      run: | 
+        apt update
+        apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        apt install docker-ce -y
+
+    - name: Pull Image
+      run: |
+        #export DOCKER_IMAGE="python:3.4-alpine"
+        #docker pull $DOCKER_IMAGE
+        export DOCKER_IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        docker pull $DOCKER_IMAGE
+
+    - name: Scan Image
+      run: |
+        #export DOCKER_IMAGE="python:3.4-alpine"
+        export DOCKER_IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+        ./trivy image $DOCKER_IMAGE
+
+        ./trivy image -f json -o /tmp/trivy-results.json $DOCKER_IMAGE 
+        ls -latr /tmp
+
+    - name: Upload Findings
+      uses: actions/upload-artifact@v3
+      with:
+        name: vulnerabilities
+        path: /tmp/*.json
+
+    - name: Python Setup 
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+
+    - name: Trivy Summary 
+      run: python scripts/trivy-summary.py /tmp/trivy-results.json
+
+  # deploy:
+  #   needs: [test_image]
+  #   runs-on: ubuntu-latest
+  #   runs-on: jaf1
+  #   container: ubuntu:22.04
+  #   steps:
+  #   - name: Test deployment
+  #     run: |
+  #       export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
+  #       echo "Deploy code"
