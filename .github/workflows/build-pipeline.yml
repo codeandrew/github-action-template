@@ -1,8 +1,8 @@
-name: Simple Build Pipeline
+name: Demo Pipeline
 
 on: [push]
 env:
-  APPLICATION_NAME: testapp
+  APPLICATION_NAME: demoflask
   PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
   APP_VERSION: 1
 
@@ -19,26 +19,6 @@ jobs:
         id
         docker ps
 
-  # lint:
-  #   runs-on: jaf1
-  #   container: ubuntu:22.04
-
-  #   steps:
-  #   - name: Lint code
-  #     run: |
-  #       echo "CODE LINTER RUNNING"
-    # - uses: actions/checkout@v1
-    # - name: Setup Python environment
-    #   uses: actions/setup-python@v1.1.1
-    # - name: Install requirements
-    #   run: pip install --quiet --requirement requirements.txt
-    # - name: Lint code
-    #   run: |
-    #     flake8 --ignore=E501,E231 *.py
-    #     pylint --disable=C0301 --disable=C0326 *.py
-    # - name: Run unit tests
-    #   run: |
-    #     python -m unittest --verbose --failfast        
 
   build_image:
     # needs: [lint]
@@ -48,23 +28,34 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
+    - name: Setup Docker 
+      run: | 
+        apt update
+        apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        apt install docker-ce -y
+
     - name: Build Application
       run: |
         echo "BUILD COMMANDS"
     
     - name: Build and Tag
       run: |
+        cd app
         export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         echo "Building $IMAGE"
-        # docker build -t $IMAGE  .
+        docker build -t $IMAGE  .
       
     - name: Push to image registry
       run: |
+        cd app
         export IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         echo "Pushing $IMAGE"
-        # docker push $IMAGE
+        docker push $IMAGE
 
-  test_image:
+  scan_image:
     needs: [build_image]
     runs-on: jaf1
     container: ubuntu:20.04
@@ -98,12 +89,15 @@ jobs:
 
     - name: Pull Image
       run: |
-        export DOCKER_IMAGE="python:3.4-alpine"
+        #export DOCKER_IMAGE="python:3.4-alpine"
+        #docker pull $DOCKER_IMAGE
+        export DOCKER_IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         docker pull $DOCKER_IMAGE
 
     - name: Scan Image
       run: |
-        export DOCKER_IMAGE="python:3.4-alpine"
+        #export DOCKER_IMAGE="python:3.4-alpine"
+        export DOCKER_IMAGE="${{ env.PROJECT_NAME }}/${{ env.APPLICATION_NAME }}:${{ env.APP_VERSION}}"
         trivy image $DOCKER_IMAGE
 
         trivy image -f json -o /tmp/trivy-results.json $DOCKER_IMAGE 
