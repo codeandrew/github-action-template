@@ -68,7 +68,7 @@ jobs:
     - name: Setup OS
       run: |
         apt-get update 
-        apt-get install -y wget
+        apt-get install -y wget curl
 
     - name: Setup Trivy
       run: |
