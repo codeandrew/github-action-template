@@ -65,6 +65,16 @@ jobs:
     container: ubuntu:20.04
     steps:
 
+    - name: Setup OS
+      run: |
+        apt-get update 
+        apt-get install -y wget
+
+    - name: Setup Trivy
+      run: |
+        export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+        wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
+        tar zxvf trivy_${VERSION}_Linux-64bit.tar.gz']
     - name: Setup Docker 
       run: | 
         apt update
