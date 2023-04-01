@@ -2,6 +2,7 @@
 
 ## Github Action Templates
 
+For Merge Request
 ```yaml
 name: Merge Request Complete
 
@@ -21,6 +22,77 @@ jobs:
         run: |
           echo "Merge request is completed on main branch!"
 ```
+
+
+Automated Release Tag
+```yaml
+name: Create Release Tag
+
+on:
+  pull_request:
+    types: [closed]
+  push:
+    branches:
+      - main
+
+env:
+  SEMVER: ${{ env.SEMVER }}
+
+jobs:
+  create-release-tag:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Determine Version
+        id: version
+        run: echo "::set-output name=version::$(./determine_version.sh $SEMVER)"
+
+      - name: Create Tag
+        uses: anothrNick/github-tag-action@v1.14.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          message: "Release ${{ steps.version.outputs.version }}"
+          draft: false
+          prerelease: false
+
+      - name: Update SEMVER
+        if: success()
+        env:
+          SEMVER: ${{ steps.version.outputs.version }}
+        run: echo "SEMVER=${{ env.SEMVER }}" >> $GITHUB_ENV
+
+```
+script
+```bash
+#!/bin/bash
+
+set -e
+
+if [[ $# -eq 0 ]] ; then
+    echo "You must specify the current version in x.y format"
+    exit 1
+fi
+
+VERSION=$1
+LAST_CHAR=$(echo ${VERSION: -1})
+
+if [[ $LAST_CHAR == "." ]] ; then
+    VERSION="${VERSION}0"
+fi
+
+TAG_COUNT=$(git tag --list "${VERSION}.*" | wc -l | awk '{print $1}')
+
+NEW_VERSION="${VERSION}.${TAG_COUNT}"
+echo "${NEW_VERSION}"
+
+```
+
 
 ## Docker CheatSheet
 
