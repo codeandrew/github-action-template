@@ -1,5 +1,27 @@
 # github-action-template
 
+## Github Action Templates
+
+```yaml
+name: Merge Request Complete
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  detect_mr_complete:
+    runs-on: ubuntu-latest
+    if: "github.event_name == 'push' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run a script when merge request is completed
+        run: |
+          echo "Merge request is completed on main branch!"
+```
+
 ## Docker CheatSheet
 
 ```
